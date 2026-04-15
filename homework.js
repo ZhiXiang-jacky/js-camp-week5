@@ -57,6 +57,9 @@ const orders = [
  */
 function getProductById(products, productId) {
   // 請實作此函式
+  return products.find(function(product){
+    return product.id === productId
+  })|| null
 }
 
 /**
@@ -67,6 +70,13 @@ function getProductById(products, productId) {
  */
 function getProductsByCategory(products, category) {
   // 請實作此函式
+  if (category ==="全部"){
+    return products
+  }else{
+    return products.filter(function(product){
+      return product.category === category
+    })
+  }
 }
 
 /**
@@ -77,6 +87,7 @@ function getProductsByCategory(products, category) {
  */
 function getDiscountRate(product) {
   // 請實作此函式
+  return `${Math.round((product.price / product.origin_price) * 100) / 10}折`
 }
 
 /**
@@ -86,6 +97,15 @@ function getDiscountRate(product) {
  */
 function getAllCategories(products) {
   // 請實作此函式
+  // console.log ('物件-去掉重複的值',new Set(products.map(function(product){
+  //   return product.category
+  // })))
+
+  // console.log('陣列-去掉重複的值',[...new Set(products.map(function(product){
+  //   return product.category
+  // }))])
+  return [...new Set(products.map(function(product){
+    return product.category}))]
 }
 
 // ========================================
@@ -99,6 +119,10 @@ function getAllCategories(products) {
  */
 function calculateCartOriginalTotal(carts) {
   // 請實作此函式
+  return carts.reduce(function(total,cart){
+    return total +  cart.product.origin_price * cart.quantity
+  },0)
+  // console.log(carts.product)
 }
 
 /**
@@ -108,6 +132,9 @@ function calculateCartOriginalTotal(carts) {
  */
 function calculateCartTotal(carts) {
   // 請實作此函式
+  return carts.reduce(function(total,cart){
+    return total + cart.product.price * cart.quantity
+  },0)
 }
 
 /**
@@ -117,6 +144,7 @@ function calculateCartTotal(carts) {
  */
 function calculateSavings(carts) {
   // 請實作此函式
+  return calculateCartOriginalTotal(carts) - calculateCartTotal(carts)
 }
 
 /**
@@ -126,6 +154,9 @@ function calculateSavings(carts) {
  */
 function calculateCartItemCount(carts) {
   // 請實作此函式
+  return carts.reduce(function(total,cart){
+    return total + cart.quantity
+  },0)
 }
 
 /**
@@ -136,6 +167,9 @@ function calculateCartItemCount(carts) {
  */
 function isProductInCart(carts, productId) {
   // 請實作此函式
+  return carts.some(function(cart){
+    return cart.product.id === productId
+  })
 }
 
 // ========================================
@@ -148,11 +182,24 @@ function isProductInCart(carts, productId) {
  * @param {Object} product - 產品物件
  * @param {number} quantity - 數量
  * @returns {Array} - 回傳新的購物車陣列（不要修改原陣列）
- * 如果產品已存在，合併數量；如果不存在，新增一筆
+ * 如果產品已存在，合併數量；如果不存在，新增一筆 
  */
 function addToCart(carts, product, quantity) {
   // 請實作此函式
-}
+  if(isProductInCart(carts, product.id)){
+    return carts.map(function(cart){
+      if(cart.product.id === product.id){
+        cart.quantity += quantity
+      }
+      // 修正 2：map 裡面一定要 return，把加工好的品項交出去，不然會變成 undefined
+      return cart
+    })
+    }else{
+      console.log('產品不存在，新增一筆')
+      return [...carts, {id:`cart-${carts.length+1}`,product,quantity}]
+    }
+  }
+    
 
 /**
  * 2. 更新購物車商品數量
@@ -163,6 +210,20 @@ function addToCart(carts, product, quantity) {
  */
 function updateCartItemQuantity(carts, cartId, newQuantity) {
   // 請實作此函式
+  const updatedCarts = carts.map(function(cart){
+    if(cart.id === cartId){
+      return{
+        ...cart,
+        quantity:newQuantity
+      };
+    }
+    return cart
+  })
+  // 如果 newQuantity <= 0，移除該商品(再多多思考一個步驟，先把數量更新好，再來過濾掉數量 <= 0 的品項)
+  const filteredCarts = updatedCarts.filter(function(cart){
+    return cart.quantity > 0
+  })
+  return filteredCarts
 }
 
 /**
@@ -173,6 +234,9 @@ function updateCartItemQuantity(carts, cartId, newQuantity) {
  */
 function removeFromCart(carts, cartId) {
   // 請實作此函式
+  return carts.filter(function(cart){
+    return cart.id !== cartId
+  })
 }
 
 /**
@@ -181,6 +245,7 @@ function removeFromCart(carts, cartId) {
  */
 function clearCart() {
   // 請實作此函式
+  return []
 }
 
 // ========================================
@@ -237,6 +302,11 @@ function groupOrdersByPayment(orders) {
 
 // ========================================
 // 測試區域（可自行修改測試）
+console.log('=== 測試開始 ===');
+// console.log('測試1-1:',getProductById(products, 'prod-6'));
+// console.log('測試1-2:getProductsByCategory:', getProductsByCategory(products, '全部'));
+console.log('測試2-2:updateCartItemQuantity:', updateCartItemQuantity(carts, 'cart-1', -2));
+
 // ========================================
 
 // 任務一測試
