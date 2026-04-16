@@ -259,6 +259,12 @@ function clearCart() {
  */
 function calculateTotalRevenue(orders) {
   // 請實作此函式
+  return orders.reduce(function(total,order){
+    if(order.paid){
+      total += order.total
+    }
+    return total
+  },0)
 }
 
 /**
@@ -269,6 +275,10 @@ function calculateTotalRevenue(orders) {
  */
 function filterOrdersByStatus(orders, isPaid) {
   // 請實作此函式
+  return orders.filter(function(order){
+    return order.paid === isPaid
+  })
+  
 }
 
 /**
@@ -285,6 +295,16 @@ function filterOrdersByStatus(orders, isPaid) {
  */
 function generateOrderReport(orders) {
   // 請實作此函式
+  return {
+    totalOrders: orders.length,
+    paidOrders:filterOrdersByStatus(orders, true).length,
+    unpaidOrders:filterOrdersByStatus(orders, false).length,
+    totalRevenue:calculateTotalRevenue(orders),
+    averageOrderValue:Math.round(orders.reduce(function(total,order){
+      return total + order.total
+    }))
+  }
+
 }
 
 /**
@@ -298,6 +318,10 @@ function generateOrderReport(orders) {
  */
 function groupOrdersByPayment(orders) {
   // 請實作此函式
+  return {
+    'ATM': [...filterOrdersByStatus(orders, true)],
+    'Credit Card': [...filterOrdersByStatus(orders, false)]
+  }
 }
 
 // ========================================
